@@ -83,10 +83,10 @@ test_pred_seasonal = model_seasonal.predict_proba(test_features_encoded)[:, 1]
 # Prepare submission
 submission = pd.DataFrame({
     'respondent_id': test_features['respondent_id'],
-    'xyz_vaccine': test_pred_xyz,
+    'h1n1_vaccine': test_pred_xyz,
     'seasonal_vaccine': test_pred_seasonal
 })
 
 # Save submission file
-submission.to_csv('submission.csv', sep='\t', index=False)
+submission.to_csv('submission.csv', index=False)
 
