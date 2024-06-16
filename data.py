@@ -88,5 +88,5 @@ submission = pd.DataFrame({
 })
 
 # Save submission file
-submission.to_csv('submission.csv', index=False)
+submission.to_csv('submission.csv', sep=',' ,index=False)
 
