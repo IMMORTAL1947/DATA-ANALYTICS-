@@ -6,24 +6,24 @@ from sklearn.metrics import roc_auc_score
 
 
 # Load the datasets
-train_features = pd.read_csv('training_set_features.csv')
-train_labels = pd.read_csv('training_set_labels.csv')
-test_features = pd.read_csv('test_set_features.csv')
+trainf= pd.read_csv('training_set_features.csv')
+trainl = pd.read_csv('training_set_labels.csv')
+testf = pd.read_csv('test_set_features.csv')
 
 # Merge training features and labels
-train_data = pd.merge(train_features, train_labels, on='respondent_id')
+traind = pd.merge(trainf, trainl, on='respondent_id')
 
 # Impute missing values
 # Numerical features: fill with median
-numerical_features = train_data.select_dtypes(include=['float64']).columns
-train_data[numerical_features] = train_data[numerical_features].fillna(train_data[numerical_features].median())
+numerical_features = traind.select_dtypes(include=['float64']).columns
+traind[numerical_features] = traind[numerical_features].fillna(traind[numerical_features].median())
 
 # Categorical features: fill with mode
-categorical_features = train_data.select_dtypes(include=['object']).columns
-train_data[categorical_features] = train_data[categorical_features].apply(lambda x: x.fillna(x.mode()[0]))
+categorical_features = traind.select_dtypes(include=['object']).columns
+traind[categorical_features] = traind[categorical_features].apply(lambda x: x.fillna(x.mode()[0]))
 
 # Encode categorical variables
-train_data_encoded = pd.get_dummies(train_data, columns=categorical_features, drop_first=True)
+train_data_encoded = pd.get_dummies(traind, columns=categorical_features, drop_first=True)
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -62,11 +62,11 @@ roc_auc_seasonal = roc_auc_score(y_val_seasonal, y_pred_seasonal)
 print(roc_auc_xyz, roc_auc_seasonal, (roc_auc_xyz + roc_auc_seasonal) / 2)
 
 # Impute missing values for the test set
-test_features[numerical_features] = test_features[numerical_features].fillna(test_features[numerical_features].median())
-test_features[categorical_features] = test_features[categorical_features].apply(lambda x: x.fillna(x.mode()[0]))
+testf[numerical_features] = testf[numerical_features].fillna(testf[numerical_features].median())
+testf[categorical_features] = testf[categorical_features].apply(lambda x: x.fillna(x.mode()[0]))
 
 # Encode categorical variables
-test_features_encoded = pd.get_dummies(test_features, columns=categorical_features, drop_first=True)
+test_features_encoded = pd.get_dummies(testf, columns=categorical_features, drop_first=True)
 
 # Ensure the test set has the same columns as the training set
 missing_cols = set(train_data_encoded.columns) - set(test_features_encoded.columns)
@@ -82,7 +82,7 @@ test_pred_seasonal = model_seasonal.predict_proba(test_features_encoded)[:, 1]
 
 # Prepare submission
 submission = pd.DataFrame({
-    'respondent_id': test_features['respondent_id'],
+    'respondent_id': testf['respondent_id'],
     'h1n1_vaccine': test_pred_xyz,
     'seasonal_vaccine': test_pred_seasonal
 })
