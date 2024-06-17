@@ -10,11 +10,11 @@ trainf= pd.read_csv('training_set_features.csv')
 trainl = pd.read_csv('training_set_labels.csv')
 testf = pd.read_csv('test_set_features.csv')
 
-# Merge training features and labels
+
 traind = pd.merge(trainf, trainl, on='respondent_id')
 
 # Impute missing values
-# Numerical features: fill with median
+
 numerical_features = traind.select_dtypes(include=['float64']).columns
 traind[numerical_features] = traind[numerical_features].fillna(traind[numerical_features].median())
 
@@ -22,7 +22,7 @@ traind[numerical_features] = traind[numerical_features].fillna(traind[numerical_
 categorical_features = traind.select_dtypes(include=['object']).columns
 traind[categorical_features] = traind[categorical_features].apply(lambda x: x.fillna(x.mode()[0]))
 
-# Encode categorical variables
+
 train_data_encoded = pd.get_dummies(traind, columns=categorical_features, drop_first=True)
 
 from sklearn.model_selection import train_test_split
@@ -38,7 +38,7 @@ y_seasonal = train_data_encoded['seasonal_vaccine']
 X_train, X_val, y_train_xyz, y_val_xyz, y_train_seasonal, y_val_seasonal = train_test_split(
     X, y_xyz, y_seasonal, test_size=0.2, random_state=42)
 
-# Initialize and train the logistic regression model for xyz_vaccine
+
 model_xyz = LogisticRegression(max_iter=1000)
 model_xyz.fit(X_train, y_train_xyz)
 
@@ -48,11 +48,11 @@ y_pred_xyz = model_xyz.predict_proba(X_val)[:, 1]
 # Calculate ROC AUC for xyz_vaccine
 roc_auc_xyz = roc_auc_score(y_val_xyz, y_pred_xyz)
 
-# Initialize and train the logistic regression model for seasonal_vaccine
+
 model_seasonal = LogisticRegression(max_iter=1000)
 model_seasonal.fit(X_train, y_train_seasonal)
 
-# Predict probabilities for seasonal_vaccine
+
 y_pred_seasonal = model_seasonal.predict_proba(X_val)[:, 1]
 
 # Calculate ROC AUC for seasonal_vaccine
